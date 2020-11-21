@@ -1,3 +1,7 @@
 venv/
 *.pyc
 database.db
+constant_secret.py
+.idea/misc.xml
+.idea/modules.xml
+.idea/*.iml
