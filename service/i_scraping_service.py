@@ -20,3 +20,17 @@ class IScrapingService(metaclass=ABCMeta):
             DOM[オブジェクト
         """
         pass
+
+    @abstractmethod
+    def get_image(self, url: str) -> str:
+        """画像データを取得し、src欄に渡せるようなBase64文字列に変換する
+
+        Parameters
+        ----------
+        url URL
+
+        Returns
+        -------
+            画像データのBase64文字列
+        """
+        pass
