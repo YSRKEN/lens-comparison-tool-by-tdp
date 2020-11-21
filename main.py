@@ -64,10 +64,13 @@ def get_images(lens_id: str, camera_id: str, fli_id: str, api_id: str):
     corner_img_tag = page_dom.find('img[id="Crop3Pic"]')
     if center_img_tag is None or middle_img_tag is None or corner_img_tag is None:
         return jsonify({'reason': '画像一覧を読み取れませんでした.'}), codes.internal_server_error
+    center_data = scraping.get_image(center_img_tag.attrs['src'])
+    middle_data = scraping.get_image(middle_img_tag.attrs['src'])
+    corner_data = scraping.get_image(corner_img_tag.attrs['src'])
     return jsonify({
-        'center': scraping.get_image(center_img_tag.attrs['src']),
-        'middle': scraping.get_image(middle_img_tag.attrs['src']),
-        'corner': scraping.get_image(corner_img_tag.attrs['src']),
+        'center': center_data,
+        'middle': middle_data,
+        'corner': corner_data,
     })
 
 
