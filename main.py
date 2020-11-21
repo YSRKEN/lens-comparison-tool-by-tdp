@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from requests import codes
 
 from constant_secret import DEFAULT_PATH
@@ -9,6 +10,7 @@ from service.i_scraping_service import IScrapingService
 from service.sqlite_database_service import SqliteDataBaseService
 
 app = Flask(__name__)
+CORS(app)
 database: IDataBaseService = SqliteDataBaseService('database.db')
 scraping: IScrapingService = LxmlScrapingService(database)
 
