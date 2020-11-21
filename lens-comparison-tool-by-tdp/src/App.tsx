@@ -141,22 +141,34 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
   }, [loadingImageFlg]);
 
   useEffect(() => {
-    if (cameraList.length > 0 && cameraList.filter(c => c.id === cameraId).length === 0) {
-      setCameraId(cameraList[0].id);
+    if (cameraList.length > 0) {
+      if (cameraList.filter(c => c.id === cameraId).length === 0) {
+        setCameraId(cameraList[0].id);
+      } else {
+        setCameraId(cameraId);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraList]);
 
   useEffect(() => {
-    if (fliList.length > 0 && fliList.filter(c => c.id === fliId).length === 0) {
-      setFliId(fliList[0].id);
+    if (fliList.length > 0) {
+      if (fliList.filter(c => c.id === fliId).length === 0) {
+        setFliId(fliList[0].id);
+      } else {
+        setFliId(fliId);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fliList]);
 
   useEffect(() => {
-    if (apiList.length > 0 && apiList.filter(c => c.id === apiId).length === 0) {
-      setApiId(apiList[0].id);
+    if (apiList.length > 0) {
+      if (apiList.filter(c => c.id === apiId).length === 0) {
+        setApiId(apiList[0].id);
+      } else {
+        setApiId(apiId);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiList]);
@@ -167,7 +179,6 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
   const apiList2: SelectOption[] = apiList.map(l => { return { value: l.id, label: l.name } });
 
   const onChangeLens = (e: ValueType<SelectOption>) => {
-    console.log(`onChangeLens ${(e as SelectOption).value}`);
     if (e !== null && e !== undefined) {
       setLensId((e as SelectOption).value);
     }
