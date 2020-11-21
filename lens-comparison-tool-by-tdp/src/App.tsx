@@ -238,7 +238,7 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
       setPosition((e as SelectOption).value);
     }
   };
-  return <div className="border w-50">
+  return <div className="border">
     <Form className="m-3">
       <Form.Group>
         <Select options={lensList2} placeholder="レンズ名を入力" onChange={onChangeLens} />
@@ -260,15 +260,15 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
         <Alert variant="info" className={loadingImageFlg2 ? 'd-block' : 'd-none'}>画像一覧を読み込み中...</Alert>
       </Form.Group>
       <Form.Group className={apiModeFlg ? 'd-none' : 'd-block'}>
-        <img src={image.center} alt="center" style={{ maxWidth: '100%', height: 'auto' }} /><br /><br />
-        <img src={image.middle} alt="middle" style={{ maxWidth: '100%', height: 'auto' }} /><br /><br />
-        <img src={image.corner} alt="corner" style={{ maxWidth: '100%', height: 'auto' }} />
+        <img src={image.center} alt="center" style={{ maxWidth: 700, height: 'auto' }} /><br /><br />
+        <img src={image.middle} alt="middle" style={{ maxWidth: 700, height: 'auto' }} /><br /><br />
+        <img src={image.corner} alt="corner" style={{ maxWidth: 700, height: 'auto' }} />
       </Form.Group>
       <Form.Group className={apiModeFlg ? 'd-block' : 'd-none'}>
         {images.map((pair) => {
           return (<div key={pair.key}>
             <Form.Label><strong>{pair.key}</strong></Form.Label><br />
-            <img src={pair.data} alt={pair.key} style={{ maxWidth: '100%', height: 'auto' }} />
+            <img src={pair.data} alt={pair.key} style={{ maxWidth: 700, height: 'auto' }} />
           </div>);
         })}
       </Form.Group>
@@ -286,14 +286,14 @@ const App: React.FC = () => {
     init();
   }, []);
 
-  return <Container>
+  return <Container fluid>
     <Row className="my-3">
       <Col className="text-center">
         <h1>レンズ比較ツール</h1>
       </Col>
     </Row>
     <Row className="my-3">
-      <Col className="d-flex">
+      <Col className="d-flex justify-content-center">
         <LensDataCard lensList={lensList} />
         <LensDataCard lensList={lensList} />
       </Col>
