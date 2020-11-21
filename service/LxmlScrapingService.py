@@ -40,7 +40,9 @@ class LxmlScrapingService(IScrapingService):
             data = 'data:image/jpeg;base64,' + base64.b64encode(response.content).decode('utf-8')
             time.sleep(1)
             print(f'caching... [{url}]')
-            self.database.query('INSERT INTO image_cache (url, data) VALUES (?, ?)', (url, data))
+            cache_data = self.database.select('SELECT data from image_cache WHERE url=?', (url,))
+            if len(cache_data) == 0:
+                self.database.query('INSERT INTO image_cache (url, data) VALUES (?, ?)', (url, data))
             return data
         else:
             return cache_data[0]['data']
