@@ -23,6 +23,12 @@ interface Api {
   name: string;
 }
 
+interface Image {
+  center: string;
+  middle: string;
+  corner: string;
+}
+
 interface SelectOption {
   value: string;
   label: string;
@@ -37,6 +43,9 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
   const [fliList, setFliList] = useState<Fli[]>([]);
   const [fliId, setFliId] = useState('');
   const [apiList, setApiList] = useState<Api[]>([]);
+  const [apiId, setApiId] = useState('');
+  const [image, setImage] = useState<Image>({ center: '', middle: '', corner: '' });
+
 
   useEffect(() => {
     if (lensId === '') {
@@ -72,6 +81,17 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
   }, [lensId, cameraId, fliId]);
 
   useEffect(() => {
+    if (lensId === '' || cameraId === '' || fliId === '' || apiId === '') {
+      return;
+    }
+
+    const init = async () => {
+      setImage(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId}/flies/${fliId}/apis/${apiId}/images`)).json());
+    };
+    init();
+  }, [lensId, cameraId, fliId, apiId]);
+
+  useEffect(() => {
     if (cameraList.length > 0 && cameraList.filter(c => c.id === cameraId).length === 0) {
       setCameraId(cameraList[0].id);
     }
@@ -84,6 +104,13 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fliList]);
+
+  useEffect(() => {
+    if (apiList.length > 0 && apiList.filter(c => c.id === apiId).length === 0) {
+      setApiId(apiList[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiList]);
 
   const lensList2: SelectOption[] = lensList.map(l => { return { value: l.id, label: l.name } });
   const cameraList2: SelectOption[] = cameraList.map(l => { return { value: l.id, label: l.name } });
@@ -108,13 +135,24 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
     }
   };
 
+  const onChangeApi = (e: ValueType<SelectOption>) => {
+    if (e !== null && e !== undefined) {
+      setApiId((e as SelectOption).value);
+    }
+  };
+
   return <div className="border w-50">
     <Form className="m-3">
       <Form.Group>
         <Select options={lensList2} placeholder="レンズ名を入力" onChange={onChangeLens} />
         <Select options={cameraList2} placeholder="カメラ名を入力" onChange={onChangeCamera} />
         <Select options={fliList2} placeholder="焦点距離を入力" onChange={onChangeFli} />
-        <Select options={apiList2} placeholder="絞り値を入力" />
+        <Select options={apiList2} placeholder="絞り値を入力" onChange={onChangeApi} />
+      </Form.Group>
+      <Form.Group>
+        <img src={image.center} alt="center" style={{ maxWidth: '100%', height: 'auto' }} /><br /><br />
+        <img src={image.middle} alt="middle" style={{ maxWidth: '100%', height: 'auto' }} /><br /><br />
+        <img src={image.corner} alt="corner" style={{ maxWidth: '100%', height: 'auto' }} />
       </Form.Group>
     </Form>
   </div>
