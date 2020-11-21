@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Container, Form, Row } from 'react-bootstrap';
+import { Alert, Col, Container, Form, Row } from 'react-bootstrap';
 import Select, { ValueType } from 'react-select';
 
 
@@ -38,12 +38,16 @@ const SERVER_URL = 'http://localhost:5000';
 
 const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
   const [lensId, setLensId] = useState('');
+  const [loadingCameraListFlg, setLoadingCameraListFlg] = useState(false);
   const [cameraList, setCameraList] = useState<Camera[]>([]);
   const [cameraId, setCameraId] = useState('');
+  const [loadingFliListFlg, setLoadingFliListFlg] = useState(false);
   const [fliList, setFliList] = useState<Fli[]>([]);
   const [fliId, setFliId] = useState('');
+  const [loadingApiListFlg, setLoadingApiListFlg] = useState(false);
   const [apiList, setApiList] = useState<Api[]>([]);
   const [apiId, setApiId] = useState('');
+  const [loadingImageFlg, setLoadingImageFlg] = useState(false);
   const [image, setImage] = useState<Image>({ center: '', middle: '', corner: '' });
 
 
@@ -52,44 +56,89 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
       return;
     }
 
-    const init = async () => {
-      setCameraList(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras`)).json());
-    };
-    init();
+    if (!loadingCameraListFlg) {
+      setLoadingCameraListFlg(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lensId]);
 
   useEffect(() => {
-    if (lensId === '' || cameraId === '') {
-      return;
+    if (loadingCameraListFlg && lensId !== '') {
+      const init = async () => {
+        setCameraList(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras`)).json());
+        setLoadingCameraListFlg(false);
+      };
+      init();
     }
-
-    const init = async () => {
-      setFliList(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId}/flies`)).json());
-    };
-    init();
-  }, [lensId, cameraId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingCameraListFlg]);
 
   useEffect(() => {
-    if (lensId === '' || cameraId === '' || fliId === '') {
+    if (cameraId === '') {
       return;
     }
 
-    const init = async () => {
-      setApiList(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId}/flies/${fliId}/apis`)).json());
-    };
-    init();
-  }, [lensId, cameraId, fliId]);
+    if (!loadingFliListFlg) {
+      setLoadingFliListFlg(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cameraId]);
 
   useEffect(() => {
-    if (lensId === '' || cameraId === '' || fliId === '' || apiId === '') {
+    if (loadingFliListFlg && lensId !== '' && cameraId !== '') {
+      const init = async () => {
+        setFliList(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId}/flies`)).json());
+        setLoadingFliListFlg(false);
+      };
+      init();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingFliListFlg]);
+
+  useEffect(() => {
+    if (fliId === '') {
       return;
     }
 
-    const init = async () => {
-      setImage(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId}/flies/${fliId}/apis/${apiId}/images`)).json());
-    };
-    init();
-  }, [lensId, cameraId, fliId, apiId]);
+    if (!loadingApiListFlg) {
+      setLoadingApiListFlg(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fliId]);
+
+  useEffect(() => {
+    if (loadingApiListFlg && lensId !== '' && cameraId !== '' && fliId !== '') {
+      const init = async () => {
+        setApiList(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId}/flies/${fliId}/apis`)).json());
+        setLoadingApiListFlg(false);
+      };
+      init();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingApiListFlg]);
+
+
+  useEffect(() => {
+    if (apiId === '') {
+      return;
+    }
+
+    if (!loadingImageFlg) {
+      setLoadingImageFlg(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiId]);
+
+  useEffect(() => {
+    if (loadingImageFlg && lensId !== '' && cameraId !== '' && fliId !== '' && apiId !== '') {
+      const init = async () => {
+        setImage(await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId}/flies/${fliId}/apis/${apiId}/images`)).json());
+        setLoadingImageFlg(false);
+      };
+      init();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingImageFlg]);
 
   useEffect(() => {
     if (cameraList.length > 0 && cameraList.filter(c => c.id === cameraId).length === 0) {
@@ -118,6 +167,7 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
   const apiList2: SelectOption[] = apiList.map(l => { return { value: l.id, label: l.name } });
 
   const onChangeLens = (e: ValueType<SelectOption>) => {
+    console.log(`onChangeLens ${(e as SelectOption).value}`);
     if (e !== null && e !== undefined) {
       setLensId((e as SelectOption).value);
     }
@@ -148,6 +198,12 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
         <Select options={cameraList2} placeholder="カメラ名を入力" onChange={onChangeCamera} />
         <Select options={fliList2} placeholder="焦点距離を入力" onChange={onChangeFli} />
         <Select options={apiList2} placeholder="絞り値を入力" onChange={onChangeApi} />
+      </Form.Group>
+      <Form.Group>
+        <Alert variant="info" className={loadingCameraListFlg ? 'd-block' : 'd-none'}>カメラ一覧を読み込み中...</Alert>
+        <Alert variant="info" className={loadingFliListFlg ? 'd-block' : 'd-none'}>焦点距離一覧を読み込み中...</Alert>
+        <Alert variant="info" className={loadingApiListFlg ? 'd-block' : 'd-none'}>絞り値一覧を読み込み中...</Alert>
+        <Alert variant="info" className={loadingImageFlg ? 'd-block' : 'd-none'}>画像一覧を読み込み中...</Alert>
       </Form.Group>
       <Form.Group>
         <img src={image.center} alt="center" style={{ maxWidth: '100%', height: 'auto' }} /><br /><br />
