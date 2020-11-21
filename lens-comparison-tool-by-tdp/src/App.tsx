@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import { Alert, Col, Container, Form, Row } from 'react-bootstrap';
 import Select, { ValueType } from 'react-select';
 
@@ -49,6 +49,10 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
   const [apiId, setApiId] = useState('');
   const [loadingImageFlg, setLoadingImageFlg] = useState(false);
   const [image, setImage] = useState<Image>({ center: '', middle: '', corner: '' });
+  const [apiModeFlg, setApiModeFlg] = useState(false);
+  const [position, setPosition] = useState('');
+  const [loadingImageFlg2, setLoadingImageFlg2] = useState(false);
+  const [images, setImages] = useState<{ key: string, data: string }[]>([]);
 
 
   useEffect(() => {
@@ -117,7 +121,6 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadingApiListFlg]);
 
-
   useEffect(() => {
     if (apiId === '') {
       return;
@@ -139,6 +142,33 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadingImageFlg]);
+
+  useEffect(() => {
+    if (position === '') {
+      return;
+    }
+
+    if (!loadingImageFlg2) {
+      setLoadingImageFlg2(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [position]);
+
+  useEffect(() => {
+    if (loadingImageFlg2 && lensId !== '' && cameraId !== '' && fliId !== '' && position !== '') {
+      const init = async () => {
+        const output: { key: string, data: string }[] = [];
+        for (let apiVal of apiList) {
+          const data = await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId}/flies/${fliId}/apis/${apiVal.id}/images`)).json();
+          output.push({ key: apiVal.name, data: data[position] });
+        }
+        setImages(output);
+        setLoadingImageFlg2(false);
+      };
+      init();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingImageFlg2]);
 
   useEffect(() => {
     if (cameraList.length > 0) {
@@ -202,24 +232,45 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
     }
   };
 
+  const onChangeSpiModeFlg = (e: FormEvent<any>) => setApiModeFlg(flg => !flg);
+  const onChangePosition = (e: ValueType<SelectOption>) => {
+    if (e !== null && e !== undefined) {
+      setPosition((e as SelectOption).value);
+    }
+  };
   return <div className="border w-50">
     <Form className="m-3">
       <Form.Group>
         <Select options={lensList2} placeholder="レンズ名を入力" onChange={onChangeLens} />
         <Select options={cameraList2} placeholder="カメラ名を入力" onChange={onChangeCamera} />
         <Select options={fliList2} placeholder="焦点距離を入力" onChange={onChangeFli} />
-        <Select options={apiList2} placeholder="絞り値を入力" onChange={onChangeApi} />
+        <Form.Check checked={apiModeFlg} className="m-3" label="絞り値ごとの一覧を表示" onChange={onChangeSpiModeFlg} />
+        <Select className={apiModeFlg ? 'd-none' : 'd-block'} options={apiList2} placeholder="絞り値を入力" onChange={onChangeApi} />
+        <Select className={apiModeFlg ? 'd-block' : 'd-none'} options={[
+          { value: 'center', label: '中央' },
+          { value: 'middle', label: '中間' },
+          { value: 'corner', label: '周辺' },
+        ]} placeholder="表示位置を入力" onChange={onChangePosition} />
       </Form.Group>
       <Form.Group>
         <Alert variant="info" className={loadingCameraListFlg ? 'd-block' : 'd-none'}>カメラ一覧を読み込み中...</Alert>
         <Alert variant="info" className={loadingFliListFlg ? 'd-block' : 'd-none'}>焦点距離一覧を読み込み中...</Alert>
         <Alert variant="info" className={loadingApiListFlg ? 'd-block' : 'd-none'}>絞り値一覧を読み込み中...</Alert>
         <Alert variant="info" className={loadingImageFlg ? 'd-block' : 'd-none'}>画像一覧を読み込み中...</Alert>
+        <Alert variant="info" className={loadingImageFlg2 ? 'd-block' : 'd-none'}>画像一覧を読み込み中...</Alert>
       </Form.Group>
-      <Form.Group>
+      <Form.Group className={apiModeFlg ? 'd-none' : 'd-block'}>
         <img src={image.center} alt="center" style={{ maxWidth: '100%', height: 'auto' }} /><br /><br />
         <img src={image.middle} alt="middle" style={{ maxWidth: '100%', height: 'auto' }} /><br /><br />
         <img src={image.corner} alt="corner" style={{ maxWidth: '100%', height: 'auto' }} />
+      </Form.Group>
+      <Form.Group className={apiModeFlg ? 'd-block' : 'd-none'}>
+        {images.map((pair) => {
+          return (<div key={pair.key}>
+            <Form.Label><strong>{pair.key}</strong></Form.Label><br />
+            <img src={pair.data} alt={pair.key} style={{ maxWidth: '100%', height: 'auto' }} />
+          </div>);
+        })}
       </Form.Group>
     </Form>
   </div>
