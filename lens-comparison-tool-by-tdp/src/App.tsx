@@ -175,7 +175,8 @@ const App: React.FC = () => {
       </Col>
     </Row>
     <Row className="my-3">
-      <Col>
+      <Col className="d-flex">
+        <LensDataCard lensList={lensList} />
         <LensDataCard lensList={lensList} />
       </Col>
     </Row>
