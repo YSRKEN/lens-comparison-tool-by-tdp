@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_cors import CORS
 from requests import codes
 
@@ -17,7 +17,7 @@ scraping: IScrapingService = LxmlScrapingService(database)
 
 @app.route('/')
 def root():
-    return 'OK'
+    return render_template('index.html')
 
 
 @app.route('/lenses')
