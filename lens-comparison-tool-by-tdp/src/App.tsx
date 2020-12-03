@@ -299,6 +299,27 @@ const LensDataCard: React.FC = () => {
   </div>
 };
 
+const LensListBox: React.FC = () => {
+  const { lensList } = useContext(AppContext);
+
+  return <Form.Group>
+    <Form.Label>レンズ名</Form.Label>
+    <select className="form-control" size={10}>
+      {lensList.length > 0
+        ? lensList.map(l => <option key={l.id} value={l.id}>{l.name}</option>)
+        : <option>読み込み中...</option>}
+    </select>
+  </Form.Group>;
+}
+
+const LensDataCard2: React.FC = () => {
+  return <div className="border">
+    <Form className="m-3">
+      <LensListBox />
+    </Form>
+  </div>;
+};
+
 const App: React.FC = () => {
   return <Container fluid>
     <Row className="my-3">
@@ -309,8 +330,9 @@ const App: React.FC = () => {
     <Row className="my-3">
       <Col className="d-flex justify-content-center">
         <AppContext.Provider value={useAppStore()}>
-          <LensDataCard />
-          <LensDataCard />
+          { /* <LensDataCard /> */}
+          { /* <LensDataCard /> */}
+          <LensDataCard2 />
         </AppContext.Provider>
       </Col>
     </Row>
