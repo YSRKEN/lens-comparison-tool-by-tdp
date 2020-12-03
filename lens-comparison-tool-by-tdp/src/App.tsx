@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { createContext, FormEvent, useContext, useEffect, useState } from 'react';
 import { Alert, Col, Container, Form, Row } from 'react-bootstrap';
 import Select, { ValueType } from 'react-select';
 
@@ -34,9 +34,32 @@ interface SelectOption {
   label: string;
 }
 
+interface AppStore {
+  lensList: Lens[];
+}
+
+const useAppStore = (): AppStore => {
+  const [lensList, setLensList] = useState<Lens[]>([]);
+
+  useEffect(() => {
+    const init = async () => {
+      setLensList(await (await fetch(`${SERVER_URL}/lenses`)).json());
+    };
+    init();
+  }, []);
+
+  return {
+    lensList
+  };
+};
+
+const AppContext = createContext<AppStore>({} as AppStore);
+
 const SERVER_URL = 'http://localhost:5000';
 
-const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
+const LensDataCard: React.FC = () => {
+  const { lensList } = useContext(AppContext);
+
   const [lensId, setLensId] = useState('');
   const [loadingCameraListFlg, setLoadingCameraListFlg] = useState(false);
   const [cameraList, setCameraList] = useState<Camera[]>([]);
@@ -277,15 +300,6 @@ const LensDataCard: React.FC<{ lensList: Lens[] }> = ({ lensList }) => {
 };
 
 const App: React.FC = () => {
-  const [lensList, setLensList] = useState<Lens[]>([]);
-
-  useEffect(() => {
-    const init = async () => {
-      setLensList(await (await fetch(`${SERVER_URL}/lenses`)).json());
-    };
-    init();
-  }, []);
-
   return <Container fluid>
     <Row className="my-3">
       <Col className="text-center">
@@ -294,8 +308,10 @@ const App: React.FC = () => {
     </Row>
     <Row className="my-3">
       <Col className="d-flex justify-content-center">
-        <LensDataCard lensList={lensList} />
-        <LensDataCard lensList={lensList} />
+        <AppContext.Provider value={useAppStore()}>
+          <LensDataCard />
+          <LensDataCard />
+        </AppContext.Provider>
       </Col>
     </Row>
   </Container>;
