@@ -2,6 +2,7 @@ import React, { createContext, FormEvent, useContext, useEffect, useState } from
 import { Alert, Col, Container, Form, Row } from 'react-bootstrap';
 import Select, { ValueType } from 'react-select';
 
+type ActionType = 'setLensId';
 
 interface Lens {
   id: string;
@@ -34,12 +35,20 @@ interface SelectOption {
   label: string;
 }
 
+interface Action {
+  type: ActionType;
+  message?: string;
+}
+
 interface AppStore {
   lensList: Lens[];
+  lensId: string;
+  dispatch: (action: Action) => void;
 }
 
 const useAppStore = (): AppStore => {
   const [lensList, setLensList] = useState<Lens[]>([]);
+  const [lensId, setLensId] = useState('');
 
   useEffect(() => {
     const init = async () => {
@@ -48,8 +57,25 @@ const useAppStore = (): AppStore => {
     init();
   }, []);
 
+  useEffect(() => {
+    if (lensId === '' && lensList.length > 0 && lensList.filter(l => l.id === lensId).length === 0) {
+      setLensId(lensList[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lensList]);
+
+  const dispatch = (action: Action) => {
+    switch (action.type) {
+      case 'setLensId':
+        setLensId(action.message as string);
+        break;
+    }
+  };
+
   return {
-    lensList
+    lensList,
+    lensId,
+    dispatch
   };
 };
 
@@ -300,19 +326,28 @@ const LensDataCard: React.FC = () => {
 };
 
 const LensListBox: React.FC = () => {
-  const { lensList } = useContext(AppContext);
+  const { lensList, lensId, dispatch } = useContext(AppContext);
 
   const [filter, setFilter] = useState('');
 
-  const onChange = (e: FormEvent<any>) => setFilter(e.currentTarget.value);
+  const onChangeFilter = (e: FormEvent<any>) => setFilter(e.currentTarget.value);
+  const onChangeSelect = (e: FormEvent<any>) => {
+    if (e.currentTarget.value !== '-1') {
+      dispatch({ type: 'setLensId', message: e.currentTarget.value });
+    }
+  }
 
   if (lensList.length > 0) {
-    const filteredList = lensList.filter(l => l.name.includes(filter));
+    const filteredList = [
+      ...lensList.filter(l => l.id === lensId),
+      { id: '-1', name: '----------------------------------------' },
+      ...lensList.filter(l => l.name.includes(filter) && l.id !== lensId)
+    ];
 
     return <Form.Group>
       <Form.Label>レンズ名</Form.Label>
-      <Form.Control className="mb-1" size="sm" value={filter} onChange={onChange} placeholder="フィルター" />
-      <select className="form-control" size={10}>
+      <Form.Control className="mb-1" size="sm" value={filter} onChange={onChangeFilter} placeholder="フィルター" />
+      <select className="form-control" size={10} value={lensId} onChange={onChangeSelect}>
         {filteredList.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
       </select>
     </Form.Group>;
@@ -327,11 +362,13 @@ const LensListBox: React.FC = () => {
 }
 
 const LensDataCard2: React.FC = () => {
-  return <div className="border">
-    <Form className="m-3">
-      <LensListBox />
-    </Form>
-  </div>;
+  return <AppContext.Provider value={useAppStore()}>
+    <div className="border">
+      <Form className="m-3">
+        <LensListBox />
+      </Form>
+    </div>
+  </AppContext.Provider>;
 };
 
 const App: React.FC = () => {
@@ -343,11 +380,8 @@ const App: React.FC = () => {
     </Row>
     <Row className="my-3">
       <Col className="d-flex justify-content-center">
-        <AppContext.Provider value={useAppStore()}>
-          {/*<LensDataCard />*/}
-          {/*<LensDataCard />*/}
-          {<LensDataCard2 />}
-        </AppContext.Provider>
+        {<LensDataCard2 />}
+        {<LensDataCard2 />}
       </Col>
     </Row>
   </Container>;
