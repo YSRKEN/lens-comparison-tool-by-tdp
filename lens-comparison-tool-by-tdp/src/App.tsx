@@ -302,14 +302,28 @@ const LensDataCard: React.FC = () => {
 const LensListBox: React.FC = () => {
   const { lensList } = useContext(AppContext);
 
-  return <Form.Group>
-    <Form.Label>レンズ名</Form.Label>
-    <select className="form-control" size={10}>
-      {lensList.length > 0
-        ? lensList.map(l => <option key={l.id} value={l.id}>{l.name}</option>)
-        : <option>読み込み中...</option>}
-    </select>
-  </Form.Group>;
+  const [filter, setFilter] = useState('');
+
+  const onChange = (e: FormEvent<any>) => setFilter(e.currentTarget.value);
+
+  if (lensList.length > 0) {
+    const filteredList = lensList.filter(l => l.name.includes(filter));
+
+    return <Form.Group>
+      <Form.Label>レンズ名</Form.Label>
+      <Form.Control className="mb-1" size="sm" value={filter} onChange={onChange} placeholder="フィルター" />
+      <select className="form-control" size={10}>
+        {filteredList.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+      </select>
+    </Form.Group>;
+  } else {
+    return <Form.Group>
+      <Form.Label>レンズ名</Form.Label>
+      <select className="form-control" size={10} disabled={true}>
+        <option>読み込み中...</option>
+      </select>
+    </Form.Group>;
+  }
 }
 
 const LensDataCard2: React.FC = () => {
@@ -330,9 +344,9 @@ const App: React.FC = () => {
     <Row className="my-3">
       <Col className="d-flex justify-content-center">
         <AppContext.Provider value={useAppStore()}>
-          { /* <LensDataCard /> */}
-          { /* <LensDataCard /> */}
-          <LensDataCard2 />
+          {/*<LensDataCard />*/}
+          {/*<LensDataCard />*/}
+          {<LensDataCard2 />}
         </AppContext.Provider>
       </Col>
     </Row>
