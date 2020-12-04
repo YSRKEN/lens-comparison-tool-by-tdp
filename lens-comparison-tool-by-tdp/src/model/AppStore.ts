@@ -3,6 +3,7 @@ import { Lens } from "model/Lens";
 import { Camera } from "model/Camera";
 import { Fli } from "model/Fli";
 import { Api } from "model/Api";
+import { Image } from "model/Image";
 
 export interface AppStore {
   loadingFlg: boolean;
@@ -14,5 +15,6 @@ export interface AppStore {
   fliId: string;
   apiList: Api[];
   apiId: string;
+  images: Image;
   dispatch: (action: Action) => void;
 }

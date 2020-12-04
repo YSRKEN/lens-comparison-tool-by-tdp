@@ -5,6 +5,7 @@ import LensListBox from 'component/LensListBox';
 import CameraListBox from 'component/CameraListBox';
 import FliListBox from 'component/FliListBox';
 import ApiListBox from 'component/ApiListBox';
+import ImageList from 'component/ImageList';
 import LoadingModal from 'component/LoadingModal';
 
 const LensDataCard2: React.FC = () => {
@@ -15,6 +16,7 @@ const LensDataCard2: React.FC = () => {
         <CameraListBox />
         <FliListBox />
         <ApiListBox />
+        <ImageList />
       </Form>
     </div>
     <LoadingModal />
