@@ -1,11 +1,11 @@
 import { createContext, useEffect, useState } from "react";
 import { AppStore } from "model/AppStore";
 import { Lens } from 'model/Lens';
-import { SERVER_URL } from "constant/other";
 import { Action } from "model/Action";
 import { Camera } from "model/Camera";
 import { Fli } from "model/Fli";
 import { Api } from "model/Api";
+import { getData } from "service/http";
 
 export const useAppStore = (): AppStore => {
   const [loadingFlg, setLoadingFlg] = useState(false);
@@ -21,7 +21,7 @@ export const useAppStore = (): AppStore => {
   useEffect(() => {
     const init = async () => {
       setLoadingFlg(true);
-      setLensList(await (await fetch(`${SERVER_URL}/lenses`)).json());
+      setLensList(await getData<Lens[]>('/lenses'));
     };
     init();
   }, []);
@@ -30,7 +30,7 @@ export const useAppStore = (): AppStore => {
     if (lensId !== '') {
       const init = async () => {
         setLoadingFlg(true);
-        const list: Camera[] = await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras`)).json();
+        const list = await getData<Camera[]>(`/lenses/${lensId}/cameras`);
         setCameraList(list.map(r => { return { id: `${lensId}-${r.id}`, name: r.name } }));
       };
       init();
@@ -42,7 +42,7 @@ export const useAppStore = (): AppStore => {
       const init = async () => {
         setLoadingFlg(true);
         const cameraId2 = cameraId.split('-')[1];
-        const list: Fli[] = await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId2}/flies`)).json();
+        const list = await getData<Fli[]>(`/lenses/${lensId}/cameras/${cameraId2}/flies`);
         setFliList(list.map(r => { return { id: `${lensId}-${cameraId2}-${r.id}`, name: r.name } }));
       };
       init();
@@ -56,7 +56,7 @@ export const useAppStore = (): AppStore => {
         setLoadingFlg(true);
         const lensId2 = cameraId.split('-')[0];
         const cameraId2 = cameraId.split('-')[1];
-        const list: Fli[] = await (await fetch(`${SERVER_URL}/lenses/${lensId2}/cameras/${cameraId2}/flies`)).json();
+        const list = await getData<Fli[]>(`/lenses/${lensId2}/cameras/${cameraId2}/flies`);
         setFliList(list.map(r => { return { id: `${lensId2}-${cameraId2}-${r.id}`, name: r.name } }));
       };
       init();
@@ -70,7 +70,7 @@ export const useAppStore = (): AppStore => {
         setLoadingFlg(true);
         const cameraId2 = cameraId.split('-')[1];
         const fliId2 = fliId.split('-')[2];
-        const list: Api[] = await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId2}/flies/${fliId2}/apis`)).json();
+        const list = await getData<Api[]>(`/lenses/${lensId}/cameras/${cameraId2}/flies/${fliId2}/apis`);
         setApiList(list.map(r => { return { id: `${lensId}-${cameraId2}-${fliId2}-${r.id}`, name: r.name } }));
       };
       init();
@@ -85,7 +85,7 @@ export const useAppStore = (): AppStore => {
         const lensId2 = cameraId.split('-')[0];
         const cameraId2 = cameraId.split('-')[1];
         const fliId2 = fliId.split('-')[2];
-        const list: Api[] = await (await fetch(`${SERVER_URL}/lenses/${lensId2}/cameras/${cameraId2}/flies/${fliId2}/apis`)).json();
+        const list = await getData<Api[]>(`/lenses/${lensId2}/cameras/${cameraId2}/flies/${fliId2}/apis`);
         setApiList(list.map(r => { return { id: `${lensId2}-${cameraId2}-${fliId2}-${r.id}`, name: r.name } }));
       };
       init();
@@ -100,7 +100,7 @@ export const useAppStore = (): AppStore => {
         const lensId2 = fliId.split('-')[0];
         const cameraId2 = fliId.split('-')[1];
         const fliId2 = fliId.split('-')[2];
-        const list: Api[] = await (await fetch(`${SERVER_URL}/lenses/${lensId2}/cameras/${cameraId2}/flies/${fliId2}/apis`)).json();
+        const list = await getData<Api[]>(`/lenses/${lensId2}/cameras/${cameraId2}/flies/${fliId2}/apis`);
         setApiList(list.map(r => { return { id: `${lensId2}-${cameraId2}-${fliId2}-${r.id}`, name: r.name } }));
       };
       init();
