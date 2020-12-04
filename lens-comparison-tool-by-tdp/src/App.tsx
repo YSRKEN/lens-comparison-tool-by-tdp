@@ -13,12 +13,7 @@ const App: React.FC = () => {
     </Row>
     <Row className="my-3">
       <Col className="d-flex justify-content-center">
-        {
-          <AppContext.Provider value={useAppStore()}>
-            <LensDataCard />
-          </AppContext.Provider>
-        }
-        {<LensDataCard2 />}
+        <LensDataCard2 />
       </Col>
     </Row>
   </Container>;

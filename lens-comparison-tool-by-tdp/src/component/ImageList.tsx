@@ -7,14 +7,14 @@ const ImageList: React.FC = () => {
 
   if (images.center !== '') {
     return <Form.Group>
-      <Form.Label>画像</Form.Label><br /><br />
+      <Form.Label>画像</Form.Label><br />
       <img src={images.center} alt="center" style={{ maxWidth: 700, height: 'auto' }} /><br /><br />
       <img src={images.middle} alt="middle" style={{ maxWidth: 700, height: 'auto' }} /><br /><br />
       <img src={images.corner} alt="corner" style={{ maxWidth: 700, height: 'auto' }} />
     </Form.Group>;
   } else {
     return <Form.Group>
-      <Form.Label>画像</Form.Label><br /><br />
+      <Form.Label>画像</Form.Label><br />
       <Form.Label>読込中...</Form.Label>
     </Form.Group>;
   }
