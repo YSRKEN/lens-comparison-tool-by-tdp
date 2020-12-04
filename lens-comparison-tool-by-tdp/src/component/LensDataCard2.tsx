@@ -3,6 +3,7 @@ import { Form } from 'react-bootstrap';
 import { AppContext, useAppStore } from 'service/store';
 import LensListBox from 'component/LensListBox';
 import CameraListBox from 'component/CameraListBox';
+import FliListBox from 'component/FliListBox';
 import LoadingModal from 'component/LoadingModal';
 
 const LensDataCard2: React.FC = () => {
@@ -11,6 +12,7 @@ const LensDataCard2: React.FC = () => {
       <Form className="m-3">
         <LensListBox />
         <CameraListBox />
+        <FliListBox />
       </Form>
     </div>
     <LoadingModal />
