@@ -1,2 +1,2 @@
-export type ActionType = 'setLensId' | 'setCameraId' | 'setFliId';
+export type ActionType = 'setLensId' | 'setCameraId' | 'setFliId' | 'setApiId';
 export const SERVER_URL = 'http://localhost:5000';

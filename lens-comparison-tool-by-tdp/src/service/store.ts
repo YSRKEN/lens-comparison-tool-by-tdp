@@ -5,6 +5,7 @@ import { SERVER_URL } from "constant/other";
 import { Action } from "model/Action";
 import { Camera } from "model/Camera";
 import { Fli } from "model/Fli";
+import { Api } from "model/Api";
 
 export const useAppStore = (): AppStore => {
   const [loadingFlg, setLoadingFlg] = useState(false);
@@ -14,6 +15,8 @@ export const useAppStore = (): AppStore => {
   const [cameraId, setCameraId] = useState('');
   const [fliList, setFliList] = useState<Fli[]>([]);
   const [fliId, setFliId] = useState('');
+  const [apiList, setApiList] = useState<Api[]>([]);
+  const [apiId, setApiId] = useState('');
 
   useEffect(() => {
     const init = async () => {
@@ -44,7 +47,66 @@ export const useAppStore = (): AppStore => {
       };
       init();
     }
-  }, [lensId, cameraId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lensId]);
+
+  useEffect(() => {
+    if (lensId !== '' && cameraId !== '') {
+      const init = async () => {
+        setLoadingFlg(true);
+        const lensId2 = cameraId.split('-')[0];
+        const cameraId2 = cameraId.split('-')[1];
+        const list: Fli[] = await (await fetch(`${SERVER_URL}/lenses/${lensId2}/cameras/${cameraId2}/flies`)).json();
+        setFliList(list.map(r => { return { id: `${lensId2}-${cameraId2}-${r.id}`, name: r.name } }));
+      };
+      init();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cameraId]);
+
+  useEffect(() => {
+    if (lensId !== '' && cameraId !== '' && fliId !== '') {
+      const init = async () => {
+        setLoadingFlg(true);
+        const cameraId2 = cameraId.split('-')[1];
+        const fliId2 = fliId.split('-')[2];
+        const list: Api[] = await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras/${cameraId2}/flies/${fliId2}/apis`)).json();
+        setApiList(list.map(r => { return { id: `${lensId}-${cameraId2}-${fliId2}-${r.id}`, name: r.name } }));
+      };
+      init();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lensId]);
+
+  useEffect(() => {
+    if (lensId !== '' && cameraId !== '' && fliId !== '') {
+      const init = async () => {
+        setLoadingFlg(true);
+        const lensId2 = cameraId.split('-')[0];
+        const cameraId2 = cameraId.split('-')[1];
+        const fliId2 = fliId.split('-')[2];
+        const list: Api[] = await (await fetch(`${SERVER_URL}/lenses/${lensId2}/cameras/${cameraId2}/flies/${fliId2}/apis`)).json();
+        setApiList(list.map(r => { return { id: `${lensId2}-${cameraId2}-${fliId2}-${r.id}`, name: r.name } }));
+      };
+      init();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cameraId]);
+
+  useEffect(() => {
+    if (lensId !== '' && cameraId !== '' && fliId !== '') {
+      const init = async () => {
+        setLoadingFlg(true);
+        const lensId2 = fliId.split('-')[0];
+        const cameraId2 = fliId.split('-')[1];
+        const fliId2 = fliId.split('-')[2];
+        const list: Api[] = await (await fetch(`${SERVER_URL}/lenses/${lensId2}/cameras/${cameraId2}/flies/${fliId2}/apis`)).json();
+        setApiList(list.map(r => { return { id: `${lensId2}-${cameraId2}-${fliId2}-${r.id}`, name: r.name } }));
+      };
+      init();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fliId]);
 
   useEffect(() => {
     setLoadingFlg(false);
@@ -70,6 +132,14 @@ export const useAppStore = (): AppStore => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fliList]);
 
+  useEffect(() => {
+    setLoadingFlg(false);
+    if (apiList.length > 0 && (apiId === '' || apiList.filter(r => r.id === apiId).length === 0)) {
+      setApiId(apiList[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiList]);
+
   const dispatch = (action: Action) => {
     switch (action.type) {
       case 'setLensId':
@@ -80,6 +150,9 @@ export const useAppStore = (): AppStore => {
         break;
       case 'setFliId':
         setFliId(action.message as string);
+        break;
+      case 'setApiId':
+        setApiId(action.message as string);
         break;
     }
   };
@@ -92,6 +165,8 @@ export const useAppStore = (): AppStore => {
     cameraId,
     fliList,
     fliId,
+    apiList,
+    apiId,
     dispatch
   };
 };
