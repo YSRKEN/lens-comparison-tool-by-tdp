@@ -10,9 +10,11 @@ export const useAppStore = (): AppStore => {
   const [lensId, setLensId] = useState('');
   const [cameraList, setCameraList] = useState<Camera[]>([]);
   const [cameraId, setCameraId] = useState('');
+  const [loadingFlg, setLoadingFlg] = useState(false);
 
   useEffect(() => {
     const init = async () => {
+      setLoadingFlg(true);
       setLensList(await (await fetch(`${SERVER_URL}/lenses`)).json());
     };
     init();
@@ -21,6 +23,7 @@ export const useAppStore = (): AppStore => {
   useEffect(() => {
     if (lensId !== '') {
       const init = async () => {
+        setLoadingFlg(true);
         const list: Camera[] = await (await fetch(`${SERVER_URL}/lenses/${lensId}/cameras`)).json();
         setCameraList(list.map(r => { return { id: `${lensId}-${r.id}`, name: r.name } }));
       };
@@ -29,6 +32,7 @@ export const useAppStore = (): AppStore => {
   }, [lensId]);
 
   useEffect(() => {
+    setLoadingFlg(false);
     if (lensList.length > 0 && (lensId === '' || lensList.filter(r => r.id === lensId).length === 0)) {
       setLensId(lensList[0].id);
     }
@@ -36,6 +40,7 @@ export const useAppStore = (): AppStore => {
   }, [lensList]);
 
   useEffect(() => {
+    setLoadingFlg(false);
     if (cameraList.length > 0 && (cameraId === '' || cameraList.filter(r => r.id === cameraId).length === 0)) {
       setCameraId(cameraList[0].id);
     }
@@ -54,6 +59,7 @@ export const useAppStore = (): AppStore => {
   };
 
   return {
+    loadingFlg,
     lensList,
     lensId,
     cameraList,

@@ -3,6 +3,7 @@ import { Form } from 'react-bootstrap';
 import { AppContext, useAppStore } from 'service/store';
 import LensListBox from 'component/LensListBox';
 import CameraListBox from 'component/CameraListBox';
+import LoadingModal from 'component/LoadingModal';
 
 const LensDataCard2: React.FC = () => {
   return <AppContext.Provider value={useAppStore()}>
@@ -12,6 +13,7 @@ const LensDataCard2: React.FC = () => {
         <CameraListBox />
       </Form>
     </div>
+    <LoadingModal />
   </AppContext.Provider>;
 };
 
